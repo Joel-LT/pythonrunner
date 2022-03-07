@@ -58,8 +58,8 @@ def get_logs(cmd):
     stdout, stderr = proc.communicate()
     return proc.returncode, stdout, stderr
 
-testCases = []
-testSuites = []
+testCasesDisc = []
+testSuitesDisc = []
 testCasesExec = []
 testSuitesExec = []
 testSuiteMap = {}
@@ -86,19 +86,19 @@ def test_discovery_function():
             }
             if testSuiteMap.get(suite['id']) == None:
                 testSuiteMap[suite['id']] = 1
-                testSuites.append(suite)
+                testSuitesDisc.append(suite)
             else:
                 testSuiteMap[suite['id']] = testSuiteMap.get(suite['id'])+1
-            testCases.append(file)
+            testCasesDisc.append(file)
         # run_case(os.path.join(test_dir,currfile))
 
-    test_discovery["testCases"] = testCases
-    test_discovery["testSuites"] = testSuites
+    test_discovery["testCases"] = testCasesDisc
+    test_discovery["testSuites"] = testSuitesDisc
     # print(test_discovery_json)
     return test_discovery
 
 def test_execution_function():
-    for testCase in test_discovery['testCases']:
+    for testCase in test_discovery['testCases']: # for test Cases
         execute = ['python3'] + testCase['label'].split()
         exit_code, output, logs = get_logs(execute)
         time_taken = run_case(execute)
@@ -113,7 +113,7 @@ def test_execution_function():
         testCasesExec.append(file)
     test_execution["testCases"]=testCasesExec
 
-    for testSuite in test_discovery['testSuites']:
+    for testSuite in test_discovery['testSuites']: # for test Suites
         execute = ['python3'] + testSuite['label'].split()
         exit_code, output, logs = get_logs(execute)
         time_taken = run_case(execute)
