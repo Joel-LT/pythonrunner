@@ -6,7 +6,7 @@ import importlib
 import time
 import subprocess
 from subprocess import call
-test_dir = 'test'
+test_dir = 'tests'
 test_discovery = { 
     "testCases" : {},
     "testSuites": {}
@@ -40,7 +40,6 @@ def get_locator(module):
             for func_name, func_obj in inspect.getmembers(obj):
                 if inspect.isfunction(func_obj):
                     if (func_name.startswith('test_')):
-                        # locator_file = '/'.join([module.__name__.replace('.','/'), class_name])
                         locator_file = '.'.join([class_name, func_name])
                         locator_suite = class_name
                         locator_list.append([locator_file,locator_suite])
@@ -68,7 +67,7 @@ testSuiteMap = {}
 def test_discovery_function():
     for index in range(allfiles.__len__()):
         currfile = allfiles[index]
-        module = importlib.import_module('test.'+currfile.replace('.py',''))
+        module = importlib.import_module('tests.'+currfile.replace('.py',''))
         locator_list = get_locator(module)
         for locator in locator_list:
             func_path = ' '.join([os.path.join(test_dir,currfile), locator[0]])
@@ -88,7 +87,7 @@ def test_discovery_function():
                 testSuiteMap[suite['id']] = 1
                 testSuitesDisc.append(suite)
             else:
-                testSuiteMap[suite['id']] = testSuiteMap.get(suite['id'])+1
+                testSuiteMap[suite['id']] = testSuiteMap.get(suite['id']) + 1
             testCasesDisc.append(file)
         # run_case(os.path.join(test_dir,currfile))
 
