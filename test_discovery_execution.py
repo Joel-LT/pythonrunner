@@ -61,7 +61,8 @@ def get_logs(cmd):
 testCases = []
 testSuites = []
 testCasesExec = []
-testSuiteSet = set()
+testSuitesExec = []
+testSuiteMap = {}
 
 
 def test_discovery_function():
@@ -83,9 +84,11 @@ def test_discovery_function():
                 "label": suite_path,
                 "file": os.path.join(test_dir,currfile)
             }
-            if suite['id'] not in testSuiteSet:
-                testSuiteSet.add(suite['id'])
+            if testSuiteMap.get(suite['id']) == None:
+                testSuiteMap[suite['id']] = 1
                 testSuites.append(suite)
+            else:
+                testSuiteMap[suite['id']] = testSuiteMap.get(suite['id'])+1
             testCases.append(file)
         # run_case(os.path.join(test_dir,currfile))
 
@@ -110,10 +113,27 @@ def test_execution_function():
         testCasesExec.append(file)
     test_execution["testCases"]=testCasesExec
 
+    for testSuite in test_discovery['testSuites']:
+        execute = ['python3'] + testSuite['label'].split()
+        exit_code, output, logs = get_logs(execute)
+        time_taken = run_case(execute)
+        file = {
+                "id": testSuite['id'],
+                "label": testSuite['label'],
+                "file": testSuite['file'],
+                "status": "passed" if exit_code==0 else "failed",
+                "duration": time_taken,
+                "numTests": testSuiteMap.get(testSuite['id']),
+                "failureMsg": logs.decode('utf-8') if exit_code==1 else "NA"
+            }
+        testSuitesExec.append(file)
+    test_execution["testSuites"]=testSuitesExec
+    
+
 if __name__ == "__main__":
     test_discovery_function()
-    # test_discovery_json = json.dumps(test_discovery, indent=2)
-    # print(test_discovery_json)
+    test_discovery_json = json.dumps(test_discovery, indent=2)
+    print(test_discovery_json) # Final test discovery json
     test_execution_function()
     test_execution_json = json.dumps(test_execution, indent=2)
-    print(test_execution_json)
+    print(test_execution_json) # final test execution json
